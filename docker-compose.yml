@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ayi_user
+      POSTGRES_PASSWORD: ayi_password
+      POSTGRES_DB: ayi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ayi-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - ayi-network
+    volumes:
+      - ./app:/code/app
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://ayi_user:ayi_password@db:5432/ayi_db
+
+networks:
+  ayi-network:
+    name: ayi-network
+
+volumes:
+  postgres_data:
